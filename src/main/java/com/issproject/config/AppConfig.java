@@ -16,5 +16,4 @@ public class AppConfig {
     public Session getSession(){
         return factory.getCurrentSession();
     }
-
 }
