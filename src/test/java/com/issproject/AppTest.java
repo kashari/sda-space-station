@@ -1,4 +1,4 @@
-package org.example;
+package com.issproject;
 
 import static org.junit.Assert.assertTrue;
 
