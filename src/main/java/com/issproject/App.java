@@ -1,11 +1,12 @@
 package com.issproject;
 
+import com.issproject.utils.Menu;
 
-public class App 
+public class App
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
-        System.out.println("OK");
+        Menu menu = new Menu();
+        menu.startApp();
     }
 }
