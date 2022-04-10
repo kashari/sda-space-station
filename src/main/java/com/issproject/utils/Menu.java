@@ -5,6 +5,8 @@ import com.issproject.service.SynchronizeService;
 import java.util.Scanner;
 
 public class Menu {
+    SynchronizeService synchronizeService = new SynchronizeService();
+
     private static Menu instance;
     private Menu(){}
     public static Menu getInstance(){
@@ -15,13 +17,12 @@ public class Menu {
     }
     Scanner scanner = new Scanner(System.in);
     public void startApp(){
-        SynchronizeService synchronizeService = new SynchronizeService();
         System.out.println("Type 1 to search for satelite position || Type 2 to search for astronauts || Type 3 to quit");
         String userInputStr = scanner.nextLine();
         int userInput = Integer.parseInt(userInputStr);
         switch (userInput){
             case 1:
-                synchronizeService.getReportJSON();
+                selectSatelitePositionMethod();
                 startApp();
                 break;
             case 2:
@@ -41,6 +42,23 @@ public class Menu {
             default:
                 synchronizeService.displayAllAstronauts();
                 startApp();
+        }
+    }
+
+    private void selectSatelitePositionMethod() {
+        System.out.println("Type 1 to get current position || Type 2 to get recent positions");
+        String userChoiceStr = scanner.nextLine();
+        int userChoice = Integer.parseInt(userChoiceStr);
+        switch (userChoice){
+            case 1:
+                synchronizeService.getReportJSON();
+                break;
+            case 2:
+                synchronizeService.displayAllReports();
+                break;
+            default:
+                System.out.println("Wrong input");
+                selectSatelitePositionMethod();
         }
     }
 

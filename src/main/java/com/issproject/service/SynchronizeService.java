@@ -38,8 +38,8 @@ public class SynchronizeService {
         }
         return null;
     }
-
-    public OpenStreetMap getOpenStreetMap(String lat, String lon){
+    //https://nominatim.openstreetmap.org/reverse?format=json&lat=40.730610&lon=-73.935242
+    public static OpenStreetMap getOpenStreetMap(String lat, String lon){
         final String OPEN_STREET_URL_JSON = "https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lon;
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -52,17 +52,11 @@ public class SynchronizeService {
             ObjectMapper mapper = new ObjectMapper();
             OpenStreetMap openStreetMap = mapper.readValue(response.body(),OpenStreetMap.class);
             return openStreetMap;
-
         }catch (Exception e){
             e.printStackTrace();
         }
         return null;
     }
-
-//    https://nominatim.openstreetmap.org/reverse?format=json&lat=32.2327348&lon=-81.4502764
-
-
-
 
     public Report getReportJSON(){
         HttpClient client = HttpClient.newHttpClient();
@@ -78,18 +72,17 @@ public class SynchronizeService {
             report.setLatitude(report.getPosition().getLatitude());
             report.setLongitude(report.getPosition().getLongitude());
             reportDAO.save(report);
-            if (getOpenStreetMap(report.getLatitude(),report.getLongitude()).getCountry()==null){
-                reportDAO.displayReport(report);
-                System.out.println("The craft is above ocean");
-            }
-            else{
-                System.out.println("The craft is above: " +getOpenStreetMap(report.getLatitude(),report.getLongitude()).getCountry());
-            }
+            reportDAO.displayReport(report);
+
             return report;
         }catch (Exception e){
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void displayAllReports(){
+        reportDAO.displayAllReports();
     }
 
 

@@ -1,6 +1,6 @@
 package com.issproject;
 
-import com.issproject.service.SynchronizeService;
+
 import com.issproject.utils.Menu;
 
 public class App
