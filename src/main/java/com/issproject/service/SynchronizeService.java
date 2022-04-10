@@ -38,7 +38,6 @@ public class SynchronizeService {
         }
         return null;
     }
-    //https://nominatim.openstreetmap.org/reverse?format=json&lat=40.730610&lon=-73.935242
     public static OpenStreetMap getOpenStreetMap(String lat, String lon){
         final String OPEN_STREET_URL_JSON = "https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lon;
         HttpClient client = HttpClient.newHttpClient();
@@ -71,6 +70,12 @@ public class SynchronizeService {
             Report report = mapper.readValue(response.body(),Report.class);
             report.setLatitude(report.getPosition().getLatitude());
             report.setLongitude(report.getPosition().getLongitude());
+            if (getOpenStreetMap(report.getLatitude(),report.getLongitude()).getAddress() ==null){
+                report.setLocation("OCEAN");
+            }
+            else{
+                report.setLocation(getOpenStreetMap(report.getLatitude(),report.getLongitude()).getAddress().getCountry());
+            }
             reportDAO.save(report);
             reportDAO.displayReport(report);
 
@@ -84,15 +89,11 @@ public class SynchronizeService {
     public void displayAllReports(){
         reportDAO.displayAllReports();
     }
-
-
-
     public List<Astronaut> getAstronauts(){
         List<Astronaut> astronauts = getAstroJSON().getPeople();
         astronautDAO.saveAstronauts(astronauts);
         return astronautDAO.getAstronauts();
     }
-
     public void displayAstronauts(){
         astronautDAO.displayAstronauts();
     }
@@ -103,5 +104,9 @@ public class SynchronizeService {
 
     public void displayAllAstronauts() {
         astronautDAO.displayAstronauts();
+    }
+
+    public void displayReportsGroupedByCountry(){
+        reportDAO.displayGroupedReports();
     }
 }

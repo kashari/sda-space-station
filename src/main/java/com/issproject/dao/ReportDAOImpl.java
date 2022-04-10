@@ -1,13 +1,16 @@
 package com.issproject.dao;
 
 import com.issproject.config.AppConfig;
+import com.issproject.dto.Result;
 import com.issproject.entity.Report;
 import com.issproject.service.SynchronizeService;
 import com.issproject.utils.Utils;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.hibernate.transform.Transformers;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ReportDAOImpl implements ReportDAO {
 
@@ -58,5 +61,21 @@ public class ReportDAOImpl implements ReportDAO {
         }
     }
 
+    @Override
+    public void displayGroupedReports(){
+        final String SELECT_GROUPED_REPORTS = "SELECT r.location as location,COUNT(r.id) as Occurrencies\n" +
+                "                FROM Report r\n" +
+                "                GROUP BY location";
+        Session session = AppConfig.getInstance().getSessionFactory().getCurrentSession();
+        session.beginTransaction();
 
+        Query query = session.createQuery(SELECT_GROUPED_REPORTS);
+        query.setResultTransformer(Transformers.aliasToBean(Result.class));
+        List<Result> resultList = query.getResultList();
+        for (Result r: resultList){
+            System.out.println(r.getLocation()+"\t\t"+r.getOccurrencies());
+        }
+        session.getTransaction().commit();
+        session.close();
+    }
 }

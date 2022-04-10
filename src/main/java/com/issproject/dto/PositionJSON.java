@@ -6,7 +6,7 @@ import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class Position {
+public class PositionJSON {
     @JsonProperty("latitude")
     private String latitude;
     @JsonProperty("longitude")

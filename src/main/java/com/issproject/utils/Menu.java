@@ -46,7 +46,7 @@ public class Menu {
     }
 
     private void selectSatelitePositionMethod() {
-        System.out.println("Type 1 to get current position || Type 2 to get recent positions");
+        System.out.println("Type 1 to get current position || Type 2 to get recent positions || Type 3 to get grouped reports");
         String userChoiceStr = scanner.nextLine();
         int userChoice = Integer.parseInt(userChoiceStr);
         switch (userChoice){
@@ -55,6 +55,9 @@ public class Menu {
                 break;
             case 2:
                 synchronizeService.displayAllReports();
+                break;
+            case 3:
+                synchronizeService.displayReportsGroupedByCountry();
                 break;
             default:
                 System.out.println("Wrong input");

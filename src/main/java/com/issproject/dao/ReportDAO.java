@@ -9,4 +9,5 @@ public interface ReportDAO {
     void displayReport(Report report);
     List<Report> getAllReports();
     void displayAllReports();
+    void displayGroupedReports();
 }

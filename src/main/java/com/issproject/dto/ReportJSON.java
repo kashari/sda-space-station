@@ -3,7 +3,7 @@ package com.issproject.dto;
 public class ReportJSON {
     private String message;
     private long timestamp;
-    private Position iss_position;
+    private PositionJSON iss_position;
 
     public String getMessage() {
         return message;
@@ -21,11 +21,11 @@ public class ReportJSON {
         this.timestamp = timestamp;
     }
 
-    public Position getIss_position() {
+    public PositionJSON getIss_position() {
         return iss_position;
     }
 
-    public void setIss_position(Position iss_position) {
+    public void setIss_position(PositionJSON iss_position) {
         this.iss_position = iss_position;
     }
 }
