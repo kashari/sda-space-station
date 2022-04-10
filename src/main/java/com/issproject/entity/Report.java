@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.issproject.dto.PositionJSON;
 import lombok.Data;
-
 import javax.persistence.*;
-
 @Entity
 @Table(name = "report")
 @JsonIgnoreProperties(ignoreUnknown = true)

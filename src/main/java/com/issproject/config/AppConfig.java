@@ -2,7 +2,6 @@ package com.issproject.config;
 
 import com.issproject.entity.Astronaut;
 import com.issproject.entity.Report;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 

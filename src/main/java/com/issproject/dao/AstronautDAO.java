@@ -10,4 +10,6 @@ public interface AstronautDAO {
     List <Astronaut>getAstronauts();
     void displayAstronauts();
     void displayAstronautsByCraft(String craft);
+    void createCsvFileForAllAstronauts();
+    boolean craftExist(String craft);
 }

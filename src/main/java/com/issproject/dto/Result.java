@@ -2,7 +2,6 @@ package com.issproject.dto;
 
 public class Result {
     private String location;
-
     private float Occurrencies;
     public String getLocation() {
         return location;

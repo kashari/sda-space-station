@@ -6,22 +6,21 @@ import com.issproject.dto.AstroJSON;
 import com.issproject.dto.OpenStreetMap;
 import com.issproject.entity.Astronaut;
 import com.issproject.entity.Report;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
+
 public class SynchronizeService {
 
-    private static final String REPORT_JSON = "http://api.open-notify.org/iss-now.json";
-    private static final String ASTRONAUT_JSON = "http://api.open-notify.org/astros.json";
     AstronautDAO astronautDAO = new AstronautDAOImpl();
     ReportDAO reportDAO = new ReportDAOImpl();
 
     public AstroJSON getAstroJSON(){
         HttpClient client = HttpClient.newHttpClient();
+        String ASTRONAUT_JSON = "http://api.open-notify.org/astros.json";
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .header("accept","application/json")
@@ -49,8 +48,7 @@ public class SynchronizeService {
         try{
             HttpResponse <String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
             ObjectMapper mapper = new ObjectMapper();
-            OpenStreetMap openStreetMap = mapper.readValue(response.body(),OpenStreetMap.class);
-            return openStreetMap;
+            return mapper.readValue(response.body(),OpenStreetMap.class);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -59,6 +57,7 @@ public class SynchronizeService {
 
     public Report getReportJSON(){
         HttpClient client = HttpClient.newHttpClient();
+        String REPORT_JSON = "http://api.open-notify.org/iss-now.json";
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .header("accept","application/json")
@@ -88,14 +87,7 @@ public class SynchronizeService {
 
     public void displayAllReports(){
         reportDAO.displayAllReports();
-    }
-    public List<Astronaut> getAstronauts(){
-        List<Astronaut> astronauts = getAstroJSON().getPeople();
-        astronautDAO.saveAstronauts(astronauts);
-        return astronautDAO.getAstronauts();
-    }
-    public void displayAstronauts(){
-        astronautDAO.displayAstronauts();
+        reportDAO.createCsvFileForAllReports();
     }
 
     public void displayAstronoutsByCraft(String craftName) {
@@ -104,9 +96,16 @@ public class SynchronizeService {
 
     public void displayAllAstronauts() {
         astronautDAO.displayAstronauts();
+        astronautDAO.createCsvFileForAllAstronauts();
     }
 
     public void displayReportsGroupedByCountry(){
-        reportDAO.displayGroupedReports();
+        reportDAO.createCsvFileGroupedByLocation(reportDAO.getReportsGroupedByCountry());
+    }
+    public List<Astronaut> getAstronauts(){
+        return astronautDAO.getAstronauts();
+    }
+    public boolean craftExist(String craft){
+        return astronautDAO.craftExist(craft);
     }
 }

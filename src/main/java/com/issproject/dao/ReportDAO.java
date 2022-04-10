@@ -1,7 +1,7 @@
 package com.issproject.dao;
 
+import com.issproject.dto.Result;
 import com.issproject.entity.Report;
-
 import java.util.List;
 
 public interface ReportDAO {
@@ -9,5 +9,7 @@ public interface ReportDAO {
     void displayReport(Report report);
     List<Report> getAllReports();
     void displayAllReports();
-    void displayGroupedReports();
+    void createCsvFileForAllReports();
+    void createCsvFileGroupedByLocation(List<Result>resultList);
+    List<Result> getReportsGroupedByCountry();
 }
