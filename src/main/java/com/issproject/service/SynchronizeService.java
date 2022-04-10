@@ -1,15 +1,12 @@
 package com.issproject.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.issproject.dao.AstronoutDAO;
-import com.issproject.dao.AstronoutDAOImpl;
-import com.issproject.dao.SateliteDAO;
-import com.issproject.dao.SateliteDAOImpl;
-import com.issproject.dto.People;
+import com.issproject.dao.*;
+import com.issproject.dto.AstroJSON;
+import com.issproject.dto.OpenStreetMap;
 import com.issproject.entity.Astronaut;
-import com.issproject.entity.Satelite;
+import com.issproject.entity.Report;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -18,78 +15,100 @@ import java.util.List;
 
 public class SynchronizeService {
 
-    private static final String SATELITE_JSON = "http://api.open-notify.org/iss-now.json";
-    private static final String ASTRONOUT_JSON = "http://api.open-notify.org/astros.json";
-    SateliteDAO sateliteDAO = new SateliteDAOImpl();
-    AstronoutDAO astronoutDAO = new AstronoutDAOImpl();
+    private static final String REPORT_JSON = "http://api.open-notify.org/iss-now.json";
+    private static final String ASTRONAUT_JSON = "http://api.open-notify.org/astros.json";
+    AstronautDAO astronautDAO = new AstronautDAOImpl();
+    ReportDAO reportDAO = new ReportDAOImpl();
 
-
-    public Satelite getSatelite() {
-
+    public AstroJSON getAstroJSON(){
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
-                .header("accept", "application/json")
-                .uri(URI.create(SATELITE_JSON))
+                .header("accept","application/json")
+                .uri(URI.create(ASTRONAUT_JSON))
                 .build();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+        try{
+            HttpResponse<String>response = client.send(request,HttpResponse.BodyHandlers.ofString());
             ObjectMapper mapper = new ObjectMapper();
-            Satelite satelite = mapper.readValue(response.body(), Satelite.class);
-            sateliteDAO.save(satelite);
-            return satelite;
-        } catch (Exception e) {
+            AstroJSON astroJSON = mapper.readValue(response.body(),AstroJSON.class);
+            astronautDAO.saveAstronauts(astroJSON.getPeople());
+            return astroJSON;
+        }catch (Exception e){
             e.printStackTrace();
         }
         return null;
     }
 
-    public People getPeople() {
-
+    public OpenStreetMap getOpenStreetMap(String lat, String lon){
+        final String OPEN_STREET_URL_JSON = "https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lon;
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
-                .header("accept", "application/json")
-                .uri(URI.create(ASTRONOUT_JSON))
+                .header("accept","application/json")
+                .uri(URI.create(OPEN_STREET_URL_JSON))
                 .build();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+        try{
+            HttpResponse <String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
             ObjectMapper mapper = new ObjectMapper();
-            People people = mapper.readValue(response.body(), People.class);
-            return people;
-        } catch (Exception e) {
+            OpenStreetMap openStreetMap = mapper.readValue(response.body(),OpenStreetMap.class);
+            return openStreetMap;
+
+        }catch (Exception e){
             e.printStackTrace();
         }
         return null;
     }
 
-    public void displaySatelitePosition(Satelite satelite){
-        System.out.println();
-        System.out.println(satelite.getId() + "\tLongitude: " + satelite.getPosition().getLongitude()
-        +"\tLatitude: "+satelite.getPosition().getLatitude());
+//    https://nominatim.openstreetmap.org/reverse?format=json&lat=32.2327348&lon=-81.4502764
+
+
+
+
+    public Report getReportJSON(){
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .header("accept","application/json")
+                .uri(URI.create(REPORT_JSON))
+                .build();
+        try{
+            HttpResponse<String>response = client.send(request,HttpResponse.BodyHandlers.ofString());
+            ObjectMapper mapper = new ObjectMapper();
+            Report report = mapper.readValue(response.body(),Report.class);
+            report.setLatitude(report.getPosition().getLatitude());
+            report.setLongitude(report.getPosition().getLongitude());
+            reportDAO.save(report);
+            if (getOpenStreetMap(report.getLatitude(),report.getLongitude()).getCountry()==null){
+                reportDAO.displayReport(report);
+                System.out.println("The craft is above ocean");
+            }
+            else{
+                System.out.println("The craft is above: " +getOpenStreetMap(report.getLatitude(),report.getLongitude()).getCountry());
+            }
+            return report;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public List<Astronaut>getAstronauts(){
-        List <Astronaut> astronauts = getPeople().getAstronauts();
-        astronoutDAO.saveAstronauts(astronauts);
-        return astronauts;
+
+
+    public List<Astronaut> getAstronauts(){
+        List<Astronaut> astronauts = getAstroJSON().getPeople();
+        astronautDAO.saveAstronauts(astronauts);
+        return astronautDAO.getAstronauts();
+    }
+
+    public void displayAstronauts(){
+        astronautDAO.displayAstronauts();
     }
 
     public void displayAstronoutsByCraft(String craftName) {
-        for (Astronaut a: getAstronauts()){
-            if (a.getCraft().equalsIgnoreCase(craftName)){
-                System.out.println("Craft: "+a.getCraft() +
-                        "\t Name: "+ a.getName());
-            }
-        }
+        astronautDAO.displayAstronautsByCraft(craftName);
     }
 
-    public void displayAllAstronouts() {
-        for (Astronaut a: getAstronauts()){
-            System.out.println("Craft: "+a.getCraft() +
-                    "\t Name: "+ a.getName());
-        }
+    public void displayAllAstronauts() {
+        astronautDAO.displayAstronauts();
     }
 }

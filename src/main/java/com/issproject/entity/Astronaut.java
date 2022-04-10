@@ -10,21 +10,21 @@ import javax.persistence.*;
 @Data
 public class Astronaut {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "astronaut_id")
     private int id;
     @JsonProperty("name")
     @Column(name = "astronaut_name")
     private String name;
-    @Transient
     @JsonProperty("craft")
     private String craft;
-    @ManyToOne(cascade= {
-            CascadeType.PERSIST,
-            CascadeType.DETACH,
-            CascadeType.MERGE,
-            CascadeType.REFRESH
-    })
-    @JoinColumn(name="satelite_id")
-    private Satelite satelite;
+//    @ManyToOne(cascade= {
+//            CascadeType.PERSIST,
+//            CascadeType.DETACH,
+//            CascadeType.MERGE,
+//            CascadeType.REFRESH
+//    })
+//    @JoinColumn(name="satelite_id")
+//    @JsonProperty("craft")
+//    private Satelite satelite;
 }
